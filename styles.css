@@ -1,0 +1,414 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  overflow: hidden;
+  height: 100vh;
+  font-family: 'Courier New', monospace;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Terminal Styles */
+.terminal {
+  width: 80%;
+  max-width: 900px;
+  height: 70%;
+  background: rgba(0, 10, 0, 0.9);
+  border: 2px solid #0f0;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow:
+    0 0 20px rgba(0, 255, 0, 0.3),
+    inset 0 0 60px rgba(0, 255, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+.terminal-header {
+  color: #0f0;
+  font-size: 14px;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.terminal-content {
+  color: #0f0;
+  font-size: 18px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.terminal-input {
+  display: inline;
+}
+
+.cursor {
+  display: inline-block;
+  width: 12px;
+  height: 20px;
+  background: #0f0;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+.cursor--robot {
+  width: 24px;
+  height: 24px;
+  background: none;
+  animation: robot-blink 1s step-end infinite;
+}
+
+.cursor--robot::before {
+  content: '🤖';
+  font-size: 20px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes robot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Robot Spinner */
+.robot-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 100px;
+  animation: spin-wobble 0.5s ease-in-out infinite;
+  text-shadow:
+    0 0 30px rgba(0, 255, 0, 0.8),
+    0 0 60px rgba(0, 255, 0, 0.5),
+    0 0 90px rgba(0, 255, 0, 0.3);
+  filter: drop-shadow(0 0 20px #0f0);
+}
+
+@keyframes spin-wobble {
+  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  25% { transform: translate(-50%, -50%) rotate(90deg) scale(1.1); }
+  50% { transform: translate(-50%, -50%) rotate(180deg) scale(1); }
+  75% { transform: translate(-50%, -50%) rotate(270deg) scale(1.1); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+.robot-spinner-text {
+  position: absolute;
+  top: calc(50% + 80px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: #0f0;
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  animation: pulse-text 0.5s ease-in-out infinite alternate;
+  text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+}
+
+@keyframes pulse-text {
+  0% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+}
+
+/* Matrix Code Rain */
+.code-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.code-line {
+  position: absolute;
+  color: #0f0;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  animation: code-appear 0.3s ease-out forwards;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+}
+
+@keyframes code-appear {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* THE POWER message */
+.power-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: #0f0;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  opacity: 0;
+  animation: power-flash 0.3s ease-out forwards;
+  text-shadow:
+    0 0 20px #0f0,
+    0 0 40px #0f0,
+    0 0 60px #0f0,
+    0 0 80px #0f0;
+  z-index: 50;
+}
+
+@keyframes power-flash {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Game Button */
+.game-button-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  z-index: 200;
+  opacity: 0;
+  animation: fade-in 2s ease-out forwards;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.game-button {
+  padding: 30px 60px;
+  font-size: 28px;
+  font-family: 'Courier New', monospace;
+  background: transparent;
+  color: #0f0;
+  border: 3px solid #0f0;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  position: relative;
+  overflow: hidden;
+  animation: button-glow 2s ease-in-out infinite alternate;
+  text-shadow: 0 0 10px #0f0;
+  box-shadow:
+    0 0 20px rgba(0, 255, 0, 0.3),
+    inset 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.game-button:hover {
+  background: rgba(0, 255, 0, 0.1);
+  box-shadow:
+    0 0 40px rgba(0, 255, 0, 0.5),
+    inset 0 0 40px rgba(0, 255, 0, 0.2);
+}
+
+@keyframes button-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 255, 0, 0.1);
+    text-shadow: 0 0 10px #0f0;
+  }
+  100% {
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), inset 0 0 40px rgba(0, 255, 0, 0.2);
+    text-shadow: 0 0 20px #0f0, 0 0 40px #0f0;
+  }
+}
+
+/* Final Terminal (clean look) */
+.terminal--final {
+  background: #1a1a1a;
+  border-color: #333;
+  box-shadow: none;
+}
+
+.terminal--final .terminal-content {
+  color: #ccc;
+}
+
+.terminal--final .prompt {
+  color: #6c6;
+}
+
+/* Screen Shake */
+.shake {
+  animation: shake 0.1s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-5px, 5px); }
+  50% { transform: translate(5px, -5px); }
+  75% { transform: translate(-5px, -5px); }
+}
+
+.shake-intense {
+  animation: shake-intense 0.15s ease-in-out;
+}
+
+@keyframes shake-intense {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-10px, 10px) rotate(-1deg); }
+  40% { transform: translate(10px, -10px) rotate(1deg); }
+  60% { transform: translate(-10px, -10px) rotate(-1deg); }
+  80% { transform: translate(10px, 10px) rotate(1deg); }
+}
+
+/* Retro Overlays */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 101;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.vignette--intense {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 20%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+}
+
+.grain {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 102;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  animation: grain 0.5s steps(4) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-5%, -5%); }
+  50% { transform: translate(5%, 5%); }
+  75% { transform: translate(-2%, 3%); }
+}
+
+.flicker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 103;
+  background: white;
+  opacity: 0.02;
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.04; }
+  100% { opacity: 0.02; }
+}
+
+/* FX Canvas */
+#fx-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#fx-canvas.active {
+  opacity: 1;
+}
+
+/* Hidden initially */
+.hidden {
+  display: none !important;
+}
+
+/* RGB Shift effect on elements */
+.rgb-shift {
+  text-shadow:
+    -2px 0 rgba(255, 0, 0, 0.5),
+    2px 0 rgba(0, 255, 255, 0.5);
+  animation: rgb-wobble 0.2s ease-in-out infinite;
+}
+
+@keyframes rgb-wobble {
+  0%, 100% {
+    text-shadow:
+      -2px 0 rgba(255, 0, 0, 0.5),
+      2px 0 rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    text-shadow:
+      -4px 1px rgba(255, 0, 0, 0.7),
+      4px -1px rgba(0, 255, 255, 0.7);
+  }
+}
+
+/* Bloom pulse */
+.bloom-pulse {
+  animation: bloom-pulse 0.5s ease-out;
+}
+
+@keyframes bloom-pulse {
+  0% { filter: brightness(1) blur(0px); }
+  50% { filter: brightness(2) blur(4px); }
+  100% { filter: brightness(1) blur(0px); }
+}
