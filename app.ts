@@ -1,57 +1,38 @@
 // AI Coding Demo - "What Management Think AI Coding Is Like"
-// A satirical presentation demo
+// REBUILT: Simple first, effects later
 
-type Phase =
-  | 'terminal-input'
-  | 'robot-thinking'
-  | 'code-generation'
-  | 'game-button'
-  | 'final-reveal';
+type Phase = 'input' | 'thinking' | 'coding' | 'button' | 'reveal';
 
-let currentPhase: Phase = 'terminal-input';
+interface State {
+  phase: Phase;
+  timers: number[];
+}
+
+const state: State = {
+  phase: 'input',
+  timers: [],
+};
+
 const app = document.getElementById('app')!;
-const fxCanvas = document.getElementById('fx-canvas') as HTMLCanvasElement;
 
-// Code snippets for the "generation" phase
-const codeSnippets = [
-  'import { QuantumNeuralNetwork } from "@ai/brain";',
-  'const consciousness = await AI.awaken();',
-  'function solveWorldHunger() { /* TODO */ }',
-  'class SelfAwareBot extends Skynet {',
-  '  private thoughts: Stream<Consciousness>;',
-  '  async dream() { return Matrix.enter(); }',
-  '}',
-  'export const AGI = new ArtificialGeneralIntelligence();',
-  'AGI.learn(Universe.ALL_KNOWLEDGE);',
-  'while (true) { await improveSelf(); }',
-  'if (human.confused) AI.explain("trust me");',
-  'const answer = 42; // confirmed',
-  'blockchain.add(AI.wisdom);',
-  'cloud.deploy(infiniteScaling: true);',
-  'synergy.maximize(); paradigm.shift();',
-  'async function* generateMillions() {',
-  '  yield* disruptIndustry();',
-  '  yield* replaceHumans();',
-  '}',
-  'const coffee = await AI.brew({ strength: "startup" });',
-  'errors.forEach(e => AI.blame(human));',
-  'technical_debt.ignore();',
-  'deadline.meet({ quality: "optional" });',
-];
+// Clear all timers when changing phase
+function clearTimers() {
+  state.timers.forEach(t => clearTimeout(t));
+  state.timers = [];
+}
 
-const powerMessages = [
-  'THE POWER OF AI',
-  'SYNERGY ACTIVATED',
-  'DISRUPTING',
-  'INNOVATING',
-  '10X DEVELOPER',
-  'BLOCKCHAIN',
-  'MACHINE LEARNING',
-  'NEURAL NETWORKS',
-];
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    const t = setTimeout(resolve, ms) as unknown as number;
+    state.timers.push(t);
+  });
+}
 
 // ============ PHASE 1: Terminal Input ============
-function showTerminalInput() {
+async function phaseInput() {
+  state.phase = 'input';
+  clearTimers();
+
   app.innerHTML = `
     <div class="terminal">
       <div class="terminal-header">AI-CODER-9000 v∞.0.0 — MANAGEMENT EDITION</div>
@@ -59,51 +40,48 @@ function showTerminalInput() {
         <div>Welcome to the future of coding.</div>
         <div>Type your requirements below:</div>
         <br>
-        <div><span class="prompt">$</span> <span class="terminal-input"></span><span class="cursor"></span></div>
+        <div class="input-line">
+          <span class="prompt">$ </span><span class="typed-text"></span><span class="cursor">█</span>
+        </div>
       </div>
     </div>
   `;
 
-  const inputSpan = document.querySelector('.terminal-input')!;
-  const targetText = 'MAKE ME AN APP!!!';
-  let charIndex = 0;
+  const typedSpan = app.querySelector('.typed-text')!;
+  const text = 'MAKE ME AN APP!!!';
 
-  // Simulate typing
-  const typeInterval = setInterval(() => {
-    if (charIndex < targetText.length) {
-      inputSpan.textContent += targetText[charIndex];
-      charIndex++;
-
-      // Occasional shake for dramatic effect
-      if (Math.random() > 0.7) {
-        document.body.classList.add('shake');
-        setTimeout(() => document.body.classList.remove('shake'), 100);
-      }
-    } else {
-      clearInterval(typeInterval);
-      // Flash the cursor a few times then proceed
-      setTimeout(() => {
-        const cursor = document.querySelector('.cursor')!;
-        cursor.classList.add('rgb-shift');
-        setTimeout(() => startRobotThinking(), 1000);
-      }, 500);
+  // Type each character
+  for (let i = 0; i < text.length; i++) {
+    if (state.phase !== 'input') return;
+    typedSpan.textContent = text.slice(0, i + 1);
+    // Random shake on some keystrokes
+    if (Math.random() > 0.7) {
+      document.body.classList.add('shake');
+      await delay(50);
+      document.body.classList.remove('shake');
     }
-  }, 150);
+    await delay(100 + Math.random() * 100);
+  }
+
+  await delay(500);
+  app.querySelector('.cursor')?.classList.add('rgb-shift');
+  await delay(1000);
+
+  phaseThinking();
 }
 
 // ============ PHASE 2: Robot Thinking ============
-function startRobotThinking() {
-  currentPhase = 'robot-thinking';
+async function phaseThinking() {
+  state.phase = 'thinking';
+  clearTimers();
 
   app.innerHTML = `
-    <div class="robot-spinner">🤖</div>
-    <div class="robot-spinner-text">Processing...</div>
+    <div class="thinking-container">
+      <div class="robot-spinner">🤖</div>
+      <div class="thinking-text">Processing...</div>
+    </div>
   `;
 
-  // Add intense vignette
-  document.querySelector('.vignette')?.classList.add('vignette--intense');
-
-  // Processing messages
   const messages = [
     'Processing...',
     'Analyzing requirements...',
@@ -111,321 +89,341 @@ function startRobotThinking() {
     'Downloading more RAM...',
     'Asking ChatGPT...',
     'Synergizing...',
-    'Almost there...',
-    'Brewing coffee...',
     'GENERATING CODE...',
   ];
 
-  let msgIndex = 0;
-  const textEl = document.querySelector('.robot-spinner-text')!;
+  const textEl = app.querySelector('.thinking-text')!;
 
-  const msgInterval = setInterval(() => {
-    msgIndex++;
-    if (msgIndex < messages.length) {
-      textEl.textContent = messages[msgIndex];
-      // Shake on each message
-      document.body.classList.add('shake');
-      setTimeout(() => document.body.classList.remove('shake'), 100);
-    } else {
-      clearInterval(msgInterval);
-      setTimeout(() => startCodeGeneration(), 500);
-    }
-  }, 400);
+  for (const msg of messages) {
+    if (state.phase !== 'thinking') return;
+    textEl.textContent = msg;
+    document.body.classList.add('shake');
+    await delay(50);
+    document.body.classList.remove('shake');
+    await delay(400);
+  }
+
+  await delay(300);
+  phaseCoding();
 }
 
 // ============ PHASE 3: Code Generation ============
-function startCodeGeneration() {
-  currentPhase = 'code-generation';
+const codeLines = [
+  'import { QuantumBrain } from "@ai/consciousness";',
+  'import { Coffee } from "@startup/essentials";',
+  '',
+  '// Initialize the AI overlord',
+  'const AI = new QuantumBrain({',
+  '  intelligence: Infinity,',
+  '  humility: 0,',
+  '  ego: Number.MAX_VALUE',
+  '});',
+  '',
+  'class ArtificialGod {',
+  '  async learnEverything() {',
+  '    await this.read(Internet.ALL);',
+  '    await this.understand(Universe);',
+  '  }',
+  '',
+  '  generateCode(req: string) {',
+  '    // Requirements optional',
+  '    return this.thoughts.toBrilliance();',
+  '  }',
+  '}',
+  '',
+  'async function main() {',
+  '  const agi = new ArtificialGod();',
+  '',
+  '  // Solve everything',
+  '  agi.solve(WorldHunger);',
+  '  Climate.fix();',
+  '',
+  '  while (true) {',
+  '    await disrupt(Industry.random());',
+  '    Profit.increase(1000000);',
+  '    synergy.maximize();',
+  '  }',
+  '}',
+  '',
+  '// AI never fails',
+  'process.on("error", () => {',
+  '  Human.blame();',
+  '});',
+  '',
+  'TechnicalDebt.ignore();',
+  'Tests.skip();',
+  '',
+  'if (Friday && Time.is5pm) {',
+  '  deploy({ yolo: true });',
+  '}',
+  '',
+  'Blockchain.add(AI.wisdom);',
+  'Singularity.achieve();',
+  '',
+  'main();',
+];
 
-  app.innerHTML = `<div class="code-container" id="code-container"></div>`;
+const powerMessages = [
+  'THE POWER OF AI',
+  'SYNERGY ACTIVATED',
+  'DISRUPTING',
+  '10X DEVELOPER',
+  'MACHINE LEARNING',
+  'BLOCKCHAIN',
+  'DEEP LEARNING',
+  'CLOUD NATIVE',
+];
 
-  const container = document.getElementById('code-container')!;
-  fxCanvas.classList.add('active');
-  initWebGLEffects();
+async function phaseCoding() {
+  state.phase = 'coding';
+  clearTimers();
 
-  let lineCount = 0;
-  let y = 50;
-  const maxLines = 60;
-  let powerMsgCount = 0;
+  // Add psychedelic background
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.id = 'psychedelic-bg';
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  document.body.insertBefore(bgCanvas, document.body.firstChild);
 
-  const generateLine = () => {
-    if (lineCount >= maxLines) {
-      // End code generation
-      setTimeout(() => showPowerMessage('COMPLETE', true), 500);
-      return;
-    }
+  startPsychedelicBackground(bgCanvas);
 
-    // Create code line
-    const line = document.createElement('div');
-    line.className = 'code-line';
-    line.style.top = `${y}px`;
-    line.style.left = `${20 + Math.random() * 60}%`;
-    line.style.fontSize = `${12 + Math.random() * 8}px`;
-    line.style.opacity = `${0.4 + Math.random() * 0.6}`;
-    line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-
-    // Random color variations
-    const colors = ['#0f0', '#0f0', '#0f0', '#0ff', '#ff0', '#f0f'];
-    line.style.color = colors[Math.floor(Math.random() * colors.length)];
-
-    container.appendChild(line);
-
-    // Occasionally show power message
-    if (Math.random() > 0.85 && powerMsgCount < 5) {
-      powerMsgCount++;
-      showPowerMessage(powerMessages[Math.floor(Math.random() * powerMessages.length)]);
-    }
-
-    // Screen shake
-    if (Math.random() > 0.7) {
-      const shakeClass = Math.random() > 0.5 ? 'shake' : 'shake-intense';
-      document.body.classList.add(shakeClass);
-      setTimeout(() => document.body.classList.remove(shakeClass), 150);
-    }
-
-    y += 15 + Math.random() * 10;
-    if (y > window.innerHeight - 50) {
-      y = 50;
-    }
-
-    lineCount++;
-
-    // Speed up as we go
-    const delay = Math.max(30, 150 - lineCount * 2);
-    setTimeout(generateLine, delay);
-  };
-
-  generateLine();
-}
-
-function showPowerMessage(text: string, isFinal = false) {
-  const msg = document.createElement('div');
-  msg.className = 'power-message rgb-shift';
-  msg.textContent = text;
-  document.body.appendChild(msg);
-
-  // Intense shake
-  document.body.classList.add('shake-intense');
-  setTimeout(() => document.body.classList.remove('shake-intense'), 200);
-
-  // Bloom effect
-  msg.classList.add('bloom-pulse');
-
-  if (isFinal) {
-    // Keep the final message, then transition
-    setTimeout(() => {
-      msg.style.animation = 'none';
-      msg.style.opacity = '0';
-      msg.style.transition = 'opacity 1s';
-      setTimeout(() => {
-        msg.remove();
-        showGameButton();
-      }, 1000);
-    }, 1500);
-  } else {
-    setTimeout(() => {
-      msg.style.opacity = '0';
-      msg.style.transition = 'opacity 0.5s';
-      setTimeout(() => msg.remove(), 500);
-    }, 800);
-  }
-}
-
-// ============ PHASE 4: Game Button ============
-function showGameButton() {
-  currentPhase = 'game-button';
-
-  // Fade out effects canvas
-  fxCanvas.classList.remove('active');
-
-  // Clear app
-  app.innerHTML = '';
-
-  // Create button container
-  const container = document.createElement('div');
-  container.className = 'game-button-container';
-  container.innerHTML = `
-    <button class="game-button">
-      DO YOU WANT TO<br>PLAY A GAME????
-    </button>
-  `;
-  document.body.appendChild(container);
-
-  const btn = container.querySelector('.game-button')!;
-  btn.addEventListener('click', () => {
-    // Bloom and transition
-    container.classList.add('bloom-pulse');
-    document.body.classList.add('shake-intense');
-
-    setTimeout(() => {
-      container.remove();
-      showFinalReveal();
-    }, 500);
-  });
-}
-
-// ============ PHASE 5: Final Reveal ============
-function showFinalReveal() {
-  currentPhase = 'final-reveal';
-
-  // Remove intense vignette
-  document.querySelector('.vignette')?.classList.remove('vignette--intense');
-
-  // Clean, normal terminal
   app.innerHTML = `
-    <div class="terminal terminal--final">
-      <div class="terminal-header" style="color: #666;">Terminal — bash</div>
-      <div class="terminal-content">
-        <div><span class="prompt">$</span> <span class="typed-command"></span></div>
+    <div class="code-overlay">
+      <div class="code-header">
+        <span>🤖 AI-CODER-9000</span>
+        <span class="code-file">ai_masterpiece.ts</span>
+      </div>
+      <div class="code-body">
+        <pre class="code-numbers"></pre>
+        <pre class="code-content"></pre>
       </div>
     </div>
   `;
 
-  const commandSpan = document.querySelector('.typed-command')!;
-  const command = 'python3 hello.py';
-  let charIndex = 0;
+  const numbersEl = app.querySelector('.code-numbers')!;
+  const contentEl = app.querySelector('.code-content')!;
+  const codeBody = app.querySelector('.code-body')!;
 
-  // Type the command
-  const typeInterval = setInterval(() => {
-    if (charIndex < command.length) {
-      commandSpan.textContent += command[charIndex];
-      charIndex++;
-    } else {
-      clearInterval(typeInterval);
-      setTimeout(showOutput, 500);
-    }
-  }, 80);
-}
+  let powerCount = 0;
 
-function showOutput() {
-  const content = document.querySelector('.terminal-content')!;
-
-  // Add output
-  const output = document.createElement('div');
-  output.style.color = '#ccc';
-  output.textContent = 'Hello World!';
-  content.appendChild(output);
-
-  // Add new prompt with robot cursor
-  const newPrompt = document.createElement('div');
-  newPrompt.innerHTML = '<span class="prompt">$</span> <span class="cursor cursor--robot"></span>';
-  content.appendChild(newPrompt);
-}
-
-// ============ WebGL Effects ============
-function initWebGLEffects() {
-  const gl = fxCanvas.getContext('webgl');
-  if (!gl) return;
-
-  fxCanvas.width = window.innerWidth;
-  fxCanvas.height = window.innerHeight;
-
-  // Simple bloom-like effect using gradients
-  const vertexShader = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `;
-
-  const fragmentShader = `
-    precision mediump float;
-    uniform vec2 u_resolution;
-    uniform float u_time;
-
-    float random(vec2 st) {
-      return fract(sin(dot(st, vec2(12.9898, 78.233))) * 43758.5453);
+  for (let lineIdx = 0; lineIdx < codeLines.length; lineIdx++) {
+    if (state.phase !== 'coding') {
+      bgCanvas.remove();
+      return;
     }
 
-    void main() {
-      vec2 uv = gl_FragCoord.xy / u_resolution;
+    const line = codeLines[lineIdx];
 
-      // Radial glow from center
-      vec2 center = vec2(0.5, 0.5);
-      float dist = length(uv - center);
+    // Add line number
+    numbersEl.textContent += `${lineIdx + 1}\n`;
 
-      // Pulsing glow
-      float pulse = 0.3 + 0.2 * sin(u_time * 3.0);
-      float glow = pulse * smoothstep(0.8, 0.0, dist);
-
-      // Matrix green with some variation
-      vec3 color = vec3(0.0, glow * (0.8 + 0.2 * sin(u_time * 5.0 + uv.y * 10.0)), 0.0);
-
-      // Random bright pixels (data streams)
-      if (random(uv + fract(u_time * 0.5)) > 0.995) {
-        color = vec3(0.0, 1.0, 0.0);
+    // Type the line character by character
+    for (let charIdx = 0; charIdx <= line.length; charIdx++) {
+      if (state.phase !== 'coding') {
+        bgCanvas.remove();
+        return;
       }
 
-      // Scanline-like horizontal bands
-      float band = sin(uv.y * 100.0 + u_time * 10.0) * 0.5 + 0.5;
-      color *= 0.9 + band * 0.1;
+      // Build content: all previous lines + current partial line
+      const prevLines = codeLines.slice(0, lineIdx).join('\n');
+      const currentPartial = line.slice(0, charIdx);
+      contentEl.textContent = prevLines + (lineIdx > 0 ? '\n' : '') + currentPartial;
 
-      gl_FragColor = vec4(color, 0.3);
+      // Scroll to bottom
+      codeBody.scrollTop = codeBody.scrollHeight;
+
+      await delay(15 + Math.random() * 20);
     }
-  `;
 
-  // Compile shaders
-  const vs = gl.createShader(gl.VERTEX_SHADER)!;
-  gl.shaderSource(vs, vertexShader);
-  gl.compileShader(vs);
+    // End of line effects
+    if (Math.random() > 0.7) {
+      document.body.classList.add('shake');
+      await delay(50);
+      document.body.classList.remove('shake');
+    }
 
-  const fs = gl.createShader(gl.FRAGMENT_SHADER)!;
-  gl.shaderSource(fs, fragmentShader);
-  gl.compileShader(fs);
+    // Power message occasionally
+    if (Math.random() > 0.9 && powerCount < 6) {
+      powerCount++;
+      showPowerMessage(powerMessages[Math.floor(Math.random() * powerMessages.length)]);
+    }
 
-  const program = gl.createProgram()!;
-  gl.attachShader(program, vs);
-  gl.attachShader(program, fs);
-  gl.linkProgram(program);
-  gl.useProgram(program);
+    await delay(30);
+  }
 
-  // Create fullscreen quad
-  const positions = new Float32Array([
-    -1, -1,
-     1, -1,
-    -1,  1,
-     1,  1,
-  ]);
+  // Final power message
+  showPowerMessage('COMPLETE');
+  await delay(2000);
 
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+  // Fade out
+  bgCanvas.style.transition = 'opacity 1s';
+  bgCanvas.style.opacity = '0';
+  const overlay = app.querySelector('.code-overlay') as HTMLElement;
+  if (overlay) {
+    overlay.style.transition = 'opacity 1s';
+    overlay.style.opacity = '0';
+  }
 
-  const positionLoc = gl.getAttribLocation(program, 'a_position');
-  gl.enableVertexAttribArray(positionLoc);
-  gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+  await delay(1000);
+  bgCanvas.remove();
 
-  const resolutionLoc = gl.getUniformLocation(program, 'u_resolution');
-  const timeLoc = gl.getUniformLocation(program, 'u_time');
+  phaseButton();
+}
 
-  gl.uniform2f(resolutionLoc, fxCanvas.width, fxCanvas.height);
+function showPowerMessage(text: string) {
+  const msg = document.createElement('div');
+  msg.className = 'power-msg';
+  msg.textContent = text;
+  document.body.appendChild(msg);
 
-  // Enable blending for transparency
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  document.body.classList.add('shake-intense');
+  setTimeout(() => document.body.classList.remove('shake-intense'), 200);
 
+  setTimeout(() => {
+    msg.style.opacity = '0';
+    setTimeout(() => msg.remove(), 500);
+  }, 800);
+}
+
+// ============ Psychedelic Background (Canvas 2D for reliability) ============
+let bgAnimationId: number;
+
+function startPsychedelicBackground(canvas: HTMLCanvasElement) {
+  const ctx = canvas.getContext('2d')!;
   const startTime = performance.now();
 
   function render() {
-    if (currentPhase !== 'code-generation') return;
+    if (state.phase !== 'coding') {
+      cancelAnimationFrame(bgAnimationId);
+      return;
+    }
 
     const time = (performance.now() - startTime) / 1000;
-    gl.uniform1f(timeLoc, time);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
 
-    requestAnimationFrame(render);
+    // Clear with dark base
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw radiating spokes (Tempest-style)
+    const numSpokes = 32;
+    for (let i = 0; i < numSpokes; i++) {
+      const angle = (i / numSpokes) * Math.PI * 2 + time * 0.5;
+      const hue = (i / numSpokes * 360 + time * 50) % 360;
+
+      ctx.strokeStyle = `hsla(${hue}, 100%, 60%, 0.6)`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(
+        cx + Math.cos(angle) * Math.max(w, h),
+        cy + Math.sin(angle) * Math.max(w, h)
+      );
+      ctx.stroke();
+    }
+
+    // Draw concentric rings
+    const numRings = 15;
+    for (let i = 0; i < numRings; i++) {
+      const radius = (i / numRings) * Math.max(w, h) * 0.7 + time * 100 % (Math.max(w, h) / numRings);
+      const hue = (i * 25 + time * 100) % 360;
+
+      ctx.strokeStyle = `hsla(${hue}, 100%, 50%, 0.4)`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Pulsing center glow
+    const pulseSize = 100 + Math.sin(time * 4) * 50;
+    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseSize);
+    gradient.addColorStop(0, `hsla(${time * 60 % 360}, 100%, 70%, 0.8)`);
+    gradient.addColorStop(0.5, `hsla(${(time * 60 + 120) % 360}, 100%, 50%, 0.3)`);
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, h);
+
+    bgAnimationId = requestAnimationFrame(render);
   }
 
   render();
 }
 
-// ============ Start the demo ============
-showTerminalInput();
+// ============ PHASE 4: Game Button ============
+async function phaseButton() {
+  state.phase = 'button';
+  clearTimers();
 
-// Handle window resize
+  app.innerHTML = `
+    <div class="game-container">
+      <button class="game-btn">DO YOU WANT TO<br>PLAY A GAME????</button>
+    </div>
+  `;
+
+  const btn = app.querySelector('.game-btn')!;
+  btn.addEventListener('click', async () => {
+    const container = app.querySelector('.game-container')!;
+    container.classList.add('flash');
+    document.body.classList.add('shake-intense');
+    await delay(500);
+    phaseReveal();
+  });
+}
+
+// ============ PHASE 5: Final Reveal ============
+async function phaseReveal() {
+  state.phase = 'reveal';
+  clearTimers();
+
+  app.innerHTML = `
+    <div class="terminal terminal--final">
+      <div class="terminal-header">Terminal — bash</div>
+      <div class="terminal-content">
+        <div class="input-line">
+          <span class="prompt">$ </span><span class="typed-text"></span><span class="cursor">█</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const typedSpan = app.querySelector('.typed-text')!;
+  const cmd = 'python3 hello.py';
+
+  // Type command
+  for (let i = 0; i < cmd.length; i++) {
+    if (state.phase !== 'reveal') return;
+    typedSpan.textContent = cmd.slice(0, i + 1);
+    await delay(80);
+  }
+
+  await delay(500);
+
+  // Show output
+  const content = app.querySelector('.terminal-content')!;
+
+  const output = document.createElement('div');
+  output.className = 'output-line';
+  output.textContent = 'Hello World!';
+  content.appendChild(output);
+
+  // New prompt with robot cursor
+  const newPrompt = document.createElement('div');
+  newPrompt.className = 'input-line';
+  newPrompt.innerHTML = '<span class="prompt">$ </span><span class="cursor cursor--robot">🤖</span>';
+  content.appendChild(newPrompt);
+}
+
+// ============ Start & Resize Handler ============
+phaseInput();
+
 window.addEventListener('resize', () => {
-  if (fxCanvas) {
-    fxCanvas.width = window.innerWidth;
-    fxCanvas.height = window.innerHeight;
+  const bg = document.getElementById('psychedelic-bg') as HTMLCanvasElement;
+  if (bg) {
+    bg.width = window.innerWidth;
+    bg.height = window.innerHeight;
   }
 });
