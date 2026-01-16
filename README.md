@@ -2,6 +2,8 @@
 
 A satirical demo of "What Management Think AI Coding Is Like" - perfect for IT team presentations.
 
+See [a demo](https://ai-coding-demo.netlify.app/) on Netlify.
+
 ## The Experience
 
 1. Dramatic terminal
