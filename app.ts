@@ -401,6 +401,10 @@ async function phaseReveal() {
     await delay(80);
   }
 
+  // Hide cursor when command is "submitted"
+  const cursor = app.querySelector('.cursor')!;
+  cursor.remove();
+
   await delay(500);
 
   // Show error output
