@@ -90,7 +90,13 @@ body {
 
 .output-line {
   color: #ccc;
-  margin: 10px 0;
+  margin: 2px 0;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+}
+
+.error-line {
+  color: #f66;
 }
 
 /* Final terminal - muted style */

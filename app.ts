@@ -229,8 +229,9 @@ async function phaseCoding() {
       const currentPartial = line.slice(0, charIdx);
       contentEl.textContent = prevLines + (lineIdx > 0 ? '\n' : '') + currentPartial;
 
-      // Scroll to bottom
-      codeBody.scrollTop = codeBody.scrollHeight;
+      // Scroll both the content and numbers to bottom
+      contentEl.scrollTop = contentEl.scrollHeight;
+      numbersEl.scrollTop = numbersEl.scrollHeight;
 
       await delay(15 + Math.random() * 20);
     }
@@ -391,7 +392,7 @@ async function phaseReveal() {
   `;
 
   const typedSpan = app.querySelector('.typed-text')!;
-  const cmd = 'python3 hello.py';
+  const cmd = 'node hello.js';
 
   // Type command
   for (let i = 0; i < cmd.length; i++) {
@@ -402,13 +403,26 @@ async function phaseReveal() {
 
   await delay(500);
 
-  // Show output
+  // Show error output
   const content = app.querySelector('.terminal-content')!;
 
-  const output = document.createElement('div');
-  output.className = 'output-line';
-  output.textContent = 'Hello World!';
-  content.appendChild(output);
+  const errorLines = [
+    'hello.js:42',
+    '    synergy.maximize();',
+    '          ^',
+    '',
+    'SyntaxError: Unexpected token \'.\'',
+    '    at Module._compile (node:internal/modules/cjs/loader:1275:14)',
+    '    at Module.load (node:internal/modules/cjs/loader:1096:32)',
+  ];
+
+  for (const line of errorLines) {
+    const output = document.createElement('div');
+    output.className = 'output-line error-line';
+    output.textContent = line;
+    content.appendChild(output);
+    await delay(50);
+  }
 
   // New prompt with robot cursor
   const newPrompt = document.createElement('div');
