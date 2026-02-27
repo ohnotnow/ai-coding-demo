@@ -423,7 +423,7 @@ async function phaseReveal() {
   const content = app.querySelector('.terminal-content')!;
 
   const errorLines = [
-    'Syntax errror : hello.js:42',
+    'Syntax error : hello.js:42',
   ];
 
   for (const line of errorLines) {
