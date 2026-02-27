@@ -204,6 +204,10 @@ async function phaseCoding() {
   const contentEl = app.querySelector('.code-content')!;
   const codeBody = app.querySelector('.code-body')!;
 
+  const minGuaranteedPowerMessages = 3;
+  const forcedEveryNLines = Math.max(1, Math.floor(codeLines.length / (minGuaranteedPowerMessages + 1)));
+  const shuffledPowerMessages = [...powerMessages].sort(() => Math.random() - 0.5);
+
   let powerCount = 0;
 
   for (let lineIdx = 0; lineIdx < codeLines.length; lineIdx++) {
@@ -243,10 +247,18 @@ async function phaseCoding() {
       document.body.classList.remove('shake');
     }
 
-    // Power message occasionally
-    if (Math.random() > 0.9 && powerCount < 6) {
+    // Guarantee at least a few slogans, then keep occasional randomness.
+    const isForcedMessageLine =
+      powerCount < minGuaranteedPowerMessages &&
+      lineIdx > 0 &&
+      lineIdx % forcedEveryNLines === 0;
+
+    if ((isForcedMessageLine || Math.random() > 0.9) && powerCount < 6) {
       powerCount++;
-      showPowerMessage(powerMessages[Math.floor(Math.random() * powerMessages.length)]);
+      const forcedMessage =
+        shuffledPowerMessages[(powerCount - 1) % shuffledPowerMessages.length] ?? '10X DEVELOPER';
+      const randomMessage = powerMessages[Math.floor(Math.random() * powerMessages.length)] ?? 'SYNERGY ACTIVATED';
+      showPowerMessage(isForcedMessageLine ? forcedMessage : randomMessage);
     }
 
     await delay(30);
