@@ -35,7 +35,7 @@ async function phaseInput() {
 
   app.innerHTML = `
     <div class="terminal">
-      <div class="terminal-header">AI-CODER-9000 v∞.0.0 — MANAGEMENT EDITION</div>
+      <div class="terminal-header">THE MATHEMATICALLY INFALLIBLE PRODUCTIVITY ENGINE — Zero Downsides Edition</div>
       <div class="terminal-content">
         <div>Welcome to the future of coding.</div>
         <div>Type your requirements below:</div>
