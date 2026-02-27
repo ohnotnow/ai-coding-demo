@@ -33,13 +33,12 @@ body {
 
 /* ============ TERMINAL ============ */
 .terminal {
-  width: 80%;
-  max-width: 900px;
-  height: 70%;
+  width: min(96vw, 1250px);
+  height: min(85vh, 900px);
   background: rgba(0, 10, 0, 0.95);
   border: 2px solid #0ff;
   border-radius: 8px;
-  padding: 20px;
+  padding: clamp(20px, 2.2vw, 34px);
   box-shadow:
     0 0 30px rgba(0, 255, 255, 0.5),
     0 0 60px rgba(255, 0, 255, 0.3),
@@ -48,14 +47,14 @@ body {
 
 .terminal-header {
   color: #0ff;
-  font-size: 14px;
+  font-size: clamp(15px, 1.2vw, 20px);
   margin-bottom: 20px;
   text-shadow: 0 0 10px #0ff;
 }
 
 .terminal-content {
   color: #0ff;
-  font-size: 18px;
+  font-size: clamp(20px, 1.9vw, 30px);
   line-height: 1.6;
   text-shadow: 0 0 10px #0ff;
 }
@@ -92,6 +91,7 @@ body {
   color: #ccc;
   margin: 2px 0;
   font-family: 'Courier New', monospace;
+  font-size: clamp(17px, 1.5vw, 24px);
   white-space: pre;
 }
 
