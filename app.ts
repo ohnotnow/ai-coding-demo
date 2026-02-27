@@ -411,13 +411,7 @@ async function phaseReveal() {
   const content = app.querySelector('.terminal-content')!;
 
   const errorLines = [
-    'hello.js:42',
-    '    synergy.maximize();',
-    '          ^',
-    '',
-    'SyntaxError: Unexpected token \'.\'',
-    '    at Module._compile (node:internal/modules/cjs/loader:1275:14)',
-    '    at Module.load (node:internal/modules/cjs/loader:1096:32)',
+    'Syntax errror : hello.js:42',
   ];
 
   for (const line of errorLines) {
