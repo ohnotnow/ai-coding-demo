@@ -1,6 +1,6 @@
 # AI Coding Demo
 
-A satirical demo of "What Management Think AI Coding Is Like" - perfect for IT team presentations.
+A satirical demo of "What Regular People Think AI Coding Is Like".
 
 See [a demo](https://ai-coding-demo.netlify.app/) on Netlify.
 
